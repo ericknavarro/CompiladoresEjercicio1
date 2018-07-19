@@ -1,0 +1,58 @@
+/******************************************
+ * Ejemplo desarrollado por Erick Navarro *
+ * Blog: e-navarro.blogspot.com           *
+ * Julio - 2018                           *
+ ******************************************/
+
+//Se imprime el encabezado
+Print("Tablas de" & " multiplicar");
+
+//Se declara la variable a, de tipo numero
+Declare Number a;
+
+//Se asigna a la variable a el valor 5
+a=5;
+
+//Se imprime un el valor de la variable a
+Print("a = " & a);
+
+//Se declara la variable c, de tipo numero
+Declare Number c;
+
+//Se asigna a la variable c el valor 10
+c=10;
+
+//Se imprime un el valor de la variable c
+Print("c = " & c);
+
+//Se imprime un el valor de las variables sumadas
+Print("a + c = " & a + c);
+
+//Se imprime un el valor de las variables restadas
+Print("a - c = " & a - c);
+
+//Se imprime una comparación de las variables
+Print("a > c = " & a > c);
+
+//Se imprime una comparación de las variables
+Print("a < c = " & a < c);
+
+//Se declara la variable d, de tipo boolean
+Declare Boolean d;
+
+//Se asigna a la variable d una comparación
+d = a <> c;
+
+//Se imprime el valor de la variable booleana d
+Print("d = " & d);
+
+//Se imprime la negación de la variable booleana d
+Print("not d = " & not d);
+
+//Se imprime operaciones booleanas de prueba
+Print("a > c and  a > c =" & a > c and  a > c);
+Print("a > c or  a > c =" & a > c or  a > c);
+Print("a > c and  a < c =" & a > c and  a < c);
+Print("a > c or  a < c =" & a > c or  a < c);
+Print("true and false or true =" & true and false or true);
+Print("true and false or not true =" & true and false and not true);

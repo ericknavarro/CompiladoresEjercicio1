@@ -1,0 +1,128 @@
+/*
+ * Ejemplo desarrollado por Erick Navarro
+ * Blog: e-navarro.blogspot.com
+ * Julio - 2018
+ */
+
+package analizadores; 
+
+import arbol.Asignacion;
+import arbol.Declaracion;
+import arbol.Imprimir;
+import arbol.Instruccion;
+import arbol.Operacion;
+import arbol.Simbolo.Tipo;
+import arbol.TablaDeSimbolos;
+import java.util.LinkedList;
+import java_cup.runtime.*;
+
+parser code 
+{:
+    /**
+     * Variable en la que se almacena el arbol de sintaxis abstracta que se 
+     * genera luego del analisis sintáctico.
+     */
+    public LinkedList<Instruccion> AST;
+    /**
+     * Método al que se llama automáticamente ante algún error sintactico.
+     **/ 
+    public void syntax_error(Symbol s){ 
+            System.err.println("Error Sintáctico en la Línea " + (s.left) +" Columna "+s.right+ ". No se esperaba este componente: " +s.value+"."); 
+    } 
+    /**
+     * Método al que se llama en el momento en que ya no es posible una recuperación de errores.
+     **/ 
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{ 
+            System.err.println("Error síntactico irrecuperable en la Línea " + (s.left)+ " Columna "+s.right+". Componente " + s.value + " no reconocido."); 
+    }  
+    /**
+     * Método que devuelve el AST que se generó después de realizar el análisis sintáctico. 
+     * @return árbol de sintaxis abstacta que será utilizado posteriormente en la ejecución.
+     */
+    public LinkedList<Instruccion> getAST() {
+        return AST;
+    }
+:} 
+
+terminal String PTCOMA,PARIZQ,PARDER;
+terminal String MAS,MENOS,POR,DIVIDIDO,CONCAT;
+terminal String RTRUE,RFALSE;
+terminal String MENQUE,MAYQUE,MENIGUALQUE,MAYIGUALQUE,DIFQUE,IGUALQUE;
+terminal String RNOT,ROR,RAND;
+terminal String ENTERO;
+terminal String DECIMAL;
+terminal String CADENA;
+terminal String UMENOS;
+terminal String RPRINT;
+terminal String RDECLARE;
+terminal String RNUMBER,RSTRING,RBOOLEAN;
+terminal String IGUAL;
+terminal String IDENTIFICADOR;
+
+non terminal ini;
+non terminal LinkedList<Instruccion> instrucciones;
+non terminal Instruccion instruccion;
+non terminal Operacion expresion;
+non terminal String tipo;
+
+precedence left  CONCAT;
+precedence left  MAS,MENOS;
+precedence left  POR,DIVIDIDO;
+precedence right UMENOS; 
+precedence left  ROR;
+precedence left  RAND;
+precedence right RNOT;
+precedence left  MENQUE,MAYQUE,MENIGUALQUE,MAYIGUALQUE,DIFQUE,IGUALQUE;
+
+
+start with ini; 
+
+ini::=instrucciones:a{:
+    //se guarda el AST, que es la lista principal de instrucciones en la variable
+    //AST que se definió dentro del parser
+    parser.AST=a;
+:}
+;
+
+instrucciones ::= 
+   instrucciones:a instruccion:b{:RESULT=a; RESULT.add(b);:}
+ | instruccion:a{:RESULT=new LinkedList<>(); RESULT.add(a);:}
+; 
+
+instruccion ::= 
+   RPRINT PARIZQ expresion:a PARDER PTCOMA  {:RESULT=new Imprimir(a);:}
+ | RDECLARE tipo:a IDENTIFICADOR:b PTCOMA   {:RESULT=new Declaracion(b,a);:}
+ | IDENTIFICADOR:a IGUAL expresion:b PTCOMA {:RESULT=new Asignacion(a,b);:}
+ | error
+;
+
+tipo ::= 
+   RNUMBER:a  {:RESULT=a;:}
+ | RSTRING:a  {:RESULT=a;:}
+ | RBOOLEAN:a {:RESULT=a;:}
+;
+
+expresion  ::=
+               MENOS       expresion:a{:RESULT=new Operacion(a,  Operacion.Tipo_operacion.NEGATIVO);:}%prec UMENOS     
+ | expresion:a MAS         expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.SUMA);:}
+ | expresion:a MENOS       expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.RESTA);:}
+ | expresion:a POR         expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.MULTIPLICACION);:}
+ | expresion:a DIVIDIDO    expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.DIVISION);:}
+ | expresion:a MAYQUE      expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.MAYOR_QUE);:} 
+ | expresion:a MENQUE      expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.MENOR_QUE);:}  
+ | expresion:a MENIGUALQUE expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.MENOR_IGUAL_QUE);:} 
+ | expresion:a MAYIGUALQUE expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.MAYOR_IGUAL_QUE);:} 
+ | expresion:a DIFQUE      expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.DIFERENTE_QUE);:} 
+ | expresion:a IGUALQUE    expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.IGUAL_QUE);:} 
+ |             RNOT        expresion:a{:RESULT=new Operacion(a,  Operacion.Tipo_operacion.NOT);:}%prec RNOT
+ | expresion:a ROR         expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.OR);:}
+ | expresion:a RAND        expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.AND);:}
+ | expresion:a CONCAT      expresion:b{:RESULT=new Operacion(a,b,Operacion.Tipo_operacion.CONCATENACION);:} 
+ | PARIZQ      expresion:a PARDER     {:RESULT=a;:}
+ | ENTERO:a                           {:RESULT=new Operacion(new Double(a));:}
+ | DECIMAL:a                          {:RESULT=new Operacion(new Double(a));:}
+ | CADENA:a                           {:RESULT=new Operacion(a,Operacion.Tipo_operacion.CADENA);:}
+ | RTRUE:a                            {:RESULT=new Operacion(a,Operacion.Tipo_operacion.TRUE);:}
+ | RFALSE:a                           {:RESULT=new Operacion(a,Operacion.Tipo_operacion.FALSE);:}
+ | IDENTIFICADOR: a                   {:RESULT=new Operacion(a,Operacion.Tipo_operacion.IDENTIFICADOR);:}
+;
