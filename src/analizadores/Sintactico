@@ -65,14 +65,19 @@ non terminal Instruccion instruccion;
 non terminal Operacion expresion;
 non terminal String tipo;
 
+//Operaciones con cadenas
 precedence left  CONCAT;
-precedence left  MAS,MENOS;
-precedence left  POR,DIVIDIDO;
-precedence right UMENOS; 
+
+//Operaciones logicas
 precedence left  ROR;
 precedence left  RAND;
 precedence right RNOT;
 precedence left  MENQUE,MAYQUE,MENIGUALQUE,MAYIGUALQUE,DIFQUE,IGUALQUE;
+
+//Operaciones numericas
+precedence left  MAS,MENOS;
+precedence left  POR,DIVIDIDO;
+precedence right UMENOS; 
 
 
 start with ini; 
