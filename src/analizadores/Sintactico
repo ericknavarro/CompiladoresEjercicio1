@@ -44,7 +44,7 @@ parser code
     }
 :} 
 
-terminal String PTCOMA,PARIZQ,PARDER;
+terminal String PTCOMA,PARIZQ,PARDER,COMA;
 terminal String MAS,MENOS,POR,DIVIDIDO,CONCAT;
 terminal String RTRUE,RFALSE;
 terminal String MENQUE,MAYQUE,MENIGUALQUE,MAYIGUALQUE,DIFQUE,IGUALQUE;
@@ -61,6 +61,7 @@ terminal String IDENTIFICADOR;
 
 non terminal ini;
 non terminal LinkedList<Instruccion> instrucciones;
+non terminal LinkedList<String> lista_identificadores;
 non terminal Instruccion instruccion;
 non terminal Operacion expresion;
 non terminal String tipo;
@@ -96,10 +97,16 @@ instrucciones ::=
 
 instruccion ::= 
    RPRINT PARIZQ expresion:a PARDER PTCOMA  {:RESULT=new Imprimir(a);:}
- | RDECLARE tipo:a IDENTIFICADOR:b PTCOMA   {:RESULT=new Declaracion(b,a);:}
+ | RDECLARE tipo:a lista_identificadores:b PTCOMA   {:RESULT=new Declaracion(b,a);:}
+ | RDECLARE tipo:a lista_identificadores:b IGUAL expresion:c PTCOMA   {:RESULT=new Declaracion(b,a,c);:}
  | IDENTIFICADOR:a IGUAL expresion:b PTCOMA {:RESULT=new Asignacion(a,b);:}
  | error
 ;
+
+lista_identificadores::=
+  lista_identificadores:a COMA IDENTIFICADOR:b   {:RESULT = a; RESULT.add(b);:}
+  | IDENTIFICADOR:a   {:RESULT = new LinkedList<>(); RESULT.add(a);:}
+  ;
 
 tipo ::= 
    RNUMBER:a  {:RESULT=a;:}

@@ -60,6 +60,7 @@ COMENTMULTILINEA ="/*""/"*([^*/]|[^*]"/"|"*"[^/])*"*"*"*/"
 "<" {return new Symbol(sym.MENQUE,yyline,yychar, yytext());} 
 ">" {return new Symbol(sym.MAYQUE,yyline,yychar, yytext());} 
 "=" {return new Symbol(sym.IGUAL,yyline,yychar, yytext());} 
+"," {return new Symbol(sym.COMA,yyline,yychar, yytext());} 
 
 \n {yychar=1;}
 

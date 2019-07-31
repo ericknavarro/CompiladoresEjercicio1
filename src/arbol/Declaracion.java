@@ -3,50 +3,99 @@
  * Blog: e-navarro.blogspot.com
  * Julio - 2018
  */
-
 package arbol;
 
+import java.util.LinkedList;
+
 /**
- * Clase que ejecuta las acciones de una instrucción de declaración y que implementa
- * la interfaz de instrucción
+ * Clase que ejecuta las acciones de una instrucción de declaración y que
+ * implementa la interfaz de instrucción
+ *
  * @author Erick
  */
-public class Declaracion implements Instruccion{
+public class Declaracion implements Instruccion {
+
     /**
-     * Identificador de la variable que será declarada.
+     * Lista de Identificadores de las variables que serán declarada.
      */
-    private final String id;
+    private final LinkedList<String> identificadores;
     /**
      * Tipo de la variable que será declarada.
      */
     Simbolo.Tipo tipo;
     /**
+     * valor de la variable que será declarada
+     */
+    private final Operacion valor;
+
+    /**
      * Constructor de la clase
-     * @param a Identificador de la variable que será declarada
+     *
+     * @param a Lista de Identificadores de las variable que serán declaradas
      * @param b Tipo de la clase que será declarada
      */
-    public Declaracion(String a, String b) {
-        id=a;
+    public Declaracion(LinkedList<String> a, String b) {
+        identificadores = a;
+        this.valor = null;
         switch (b.toLowerCase()) {
-            case "numeric": tipo=Simbolo.Tipo.NUMERO;
-                     break;
-            case "string":  tipo=Simbolo.Tipo.CADENA;
-                     break;
-            case "boolean": tipo=Simbolo.Tipo.BOOLEANO;
-                     break;
+            case "numeric":
+                tipo = Simbolo.Tipo.NUMERO;
+                break;
+            case "string":
+                tipo = Simbolo.Tipo.CADENA;
+                break;
+            case "boolean":
+                tipo = Simbolo.Tipo.BOOLEANO;
+                break;
         }
     }
+
     /**
-     * Método que ejecuta la accion de declarar una variable, es una sobreescritura del 
-     * método ejecutar que se debe programar por la implementación de la interfaz
-     * instrucción
+     * Constructor de la clase Declaración cuando incluye asignacion de valor
+     *
+     * @param identificadores
+     * @param tip
+     * @param valor
+     */
+    public Declaracion(LinkedList<String> identificadores, String tip, Operacion valor) {
+        this.identificadores = identificadores;
+        this.valor = valor;
+        switch (tip.toLowerCase()) {
+            case "numeric":
+                tipo = Simbolo.Tipo.NUMERO;
+                break;
+            case "string":
+                tipo = Simbolo.Tipo.CADENA;
+                break;
+            case "boolean":
+                tipo = Simbolo.Tipo.BOOLEANO;
+                break;
+        }
+    }
+
+    /**
+     * Método que ejecuta la accion de declarar una variable, es una
+     * sobreescritura del método ejecutar que se debe programar por la
+     * implementación de la interfaz instrucción
+     *
      * @param ts Tabla de símbolos del ámbito padre.
      * @return No retorna nada porque no es una sentencia que genere un valor.
      */
     @Override
     public Object ejecutar(TablaDeSimbolos ts) {
-        ts.add(new Simbolo(id,tipo));
+        if (valor == null) {
+            for (String id : identificadores) {
+                ts.add(new Simbolo(id, tipo));
+                System.out.println("Se declaro var: " + id);
+            }
+        }else{
+            for (String id : identificadores) {
+                ts.add(new Simbolo(id, tipo));
+                System.out.println("Se declaro var: " + id);
+            }
+            ts.setValor(identificadores.getLast(), valor.ejecutar(ts));
+        }
         return null;
     }
-    
+
 }

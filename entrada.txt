@@ -8,7 +8,14 @@
 Print("Tablas de" & " multiplicar");
 
 //Se declara la variable a, de tipo numero
-Declare Number a;
+Declare Number a=25;
+Print("a = " & a);
+
+Declare Number a,b,C,D,E,F;
+
+Declare Number E,F = 100;
+Print("E = " & E);
+Print("F = " & F);
 
 //Se asigna a la variable a el valor 5
 a=5;
